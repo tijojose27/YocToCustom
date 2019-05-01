@@ -1,6 +1,5 @@
 package com.example.yoctocustom;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
@@ -58,39 +57,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         statusTV.setText(status);
 
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(ACTION_USB_ATTACHED)){
-                    status = status+"\n called reviever";
-                    Toast.makeText(getApplicationContext(), "ATTACHED", Toast.LENGTH_SHORT).show();
-                    try {
-                        aa.clear();
 
-                        YAPI.EnableUSBHost(this);
-
-                        status = "\nENABLE HOST"+status;
-                        statusTV.setText(status);
-
-                        YAPI.RegisterHub("usb");
-
-                        status = "\nregistered HOST"+status;
-                        statusTV.setText(status);
-
-
-                        YModule module = YModule.FirstModule();
-                        while (module != null) {
-                            if (module.get_productName().equals("Yocto-3D-V2")) {
-                                String serial = module.get_serialNumber();
-                                aa.add(serial);
-                            }
-                            module = module.nextModule();
-                        }
-                    } catch (YAPI_Exception e) {
-                        e.printStackTrace();
-                    }
-                    aa.notifyDataSetChanged();
-                    handler.postDelayed(r, 500);
                 }
 
                 if(action.equalsIgnoreCase(ACTION_USB_DETACHED)){
@@ -111,6 +83,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onStart()
     {
         super.onStart();
+        doYoktoStuff();
+    }
+
+    public void doYoktoStuff(){
         status = "\nON START"+status;
         statusTV.setText(status);
         try {
@@ -130,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             YModule module = YModule.FirstModule();
             while (module != null) {
                 if (module.get_productName().equals("Yocto-3D-V2")) {
-                    String serial = module.get_serialNumber();
+                    serial = module.get_serialNumber();
                     aa.add(serial);
                 }
                 module = module.nextModule();
@@ -165,9 +141,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     {
         public void run()
         {
-            status= "\n runnable running"+status;
-            statusTV.setText(status);
             if (serial != null) {
+                status= "\n RUNNABLE CHANGED STATUS"+status;
+                statusTV.setText(status);
                 YSensor tilt1 = YTilt.FindTilt(serial + ".tilt1");
                 try {
                     TextView view =  findViewById(R.id.tilt1field);
@@ -184,21 +160,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 YCompass compass = YCompass.FindCompass(serial + ".compass");
                 try {
-                    TextView view = (TextView) findViewById(R.id.compassfield);
+                    TextView view = findViewById(R.id.compassfield);
                     view.setText(String.format("%.1f %s", compass.getCurrentValue(), compass.getUnit()));
                 } catch (YAPI_Exception e) {
                     e.printStackTrace();
                 }
                 YAccelerometer accelerometer = YAccelerometer.FindAccelerometer(serial + ".accelerometer");
                 try {
-                    TextView view = (TextView) findViewById(R.id.accelfield);
+                    TextView view = findViewById(R.id.accelfield);
                     view.setText(String.format("%.1f %s", accelerometer.getCurrentValue(), accelerometer.getUnit()));
                 } catch (YAPI_Exception e) {
                     e.printStackTrace();
                 }
                 YGyro gyro = YGyro.FindGyro(serial + ".gyro");
                 try {
-                    TextView view = (TextView) findViewById(R.id.gyrofield);
+                    TextView view = findViewById(R.id.gyrofield);
                     view.setText(String.format("%.1f %s", gyro.getCurrentValue(), gyro.getUnit()));
                 } catch (YAPI_Exception e) {
                     e.printStackTrace();
